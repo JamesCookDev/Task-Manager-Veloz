@@ -26,5 +26,8 @@ services:
       - DB_PASS=admin
     depends_on:
       - db
+    env_file:
+      - .env
+  
 volumes:
   postgres_data:
