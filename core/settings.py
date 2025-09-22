@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'app',
     'rest_framework',
     'corsheaders',
+    'drf_spectacular',
+    'rest_framework_simplejwt',
 ]
 
 # ## CORREÇÃO DE MIDDLEWARE ##
@@ -151,5 +153,13 @@ else:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API do gerenciador de tarefas',
+    'DESCRIPTION': 'Documentação detalhada da API para o projeto Gerenciador de Tarefas da Veloz.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
