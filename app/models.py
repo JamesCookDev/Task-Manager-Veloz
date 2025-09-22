@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class Project (models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    members = models.ManyToManyField(User, related_name='projects')
+    members = models.ManyToManyField(User, related_name='projetos')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -26,11 +26,11 @@ class Task (models.Model):
     )
     due_date = models.DateField(blank=True, null=True)
 
-    project  = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='Projeto')
+    project  = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tarefas')
     assignee = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
-        related_name='task',
+        related_name='tarefas_atribuidas',
         blank=True,
         null=True,
     )

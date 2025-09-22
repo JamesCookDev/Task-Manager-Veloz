@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from .models import Project, Task
 from .serializers import ProjectSerializer, TaskSerializer, UserSerializer
+from .permissions import IdProjectMember
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -14,12 +15,20 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
+    queryset = Project.objects.all().prefetch_related('members', 'tarefas')
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IdProjectMember]
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(members=user)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
+    queryset = Task.objects.all().select_related('project', 'assignee')
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IdProjectMember]
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(project__in=user.projetos.all())
