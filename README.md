@@ -1,21 +1,32 @@
-
 # Gerenciador de Tarefas - API Back-end (Projeto Veloz)
 
-Este repositório contém a API back-end para o projeto Gerenciador de Tarefas, desenvolvido como parte do desafio técnico "Projeto  Veloz".
+Este repositório contém a API back-end para o projeto Gerenciador de Tarefas. Ele serve como o **serviço central (Core API)** em uma arquitetura de microsserviços, sendo a fonte da verdade para todos os dados e lógica de negócios.
 
 A API foi construída seguindo as melhores práticas de arquitetura de software, focando em segurança, performance, escalabilidade e manutenibilidade. O ambiente é 100% containerizado com Docker, garantindo portabilidade e um setup de desenvolvimento rápido e consistente.
+
+---
+
+## 🏗️ Arquitetura do Sistema
+
+Este projeto faz parte de um ecossistema multi-repositório:
+1.  **Back-end (Este Repositório):** API robusta em Django/DRF, responsável pela lógica de negócios e persistência de dados.
+2.  **BFF (Backend for Frontend):** Serviço intermediário em Go, otimizado para agregar e formatar dados para o cliente.
+3.  **Front-end:** Interface de usuário em React.
+
+Este serviço (`backend`) foi projetado para ser consumido exclusivamente pelo BFF, que atua como uma camada de segurança e otimização.
 
 ---
 
 ## ✅ Principais Funcionalidades
 
 * **Gerenciamento Completo (CRUD):** Endpoints para criar, ler, atualizar e deletar Projetos, Tarefas e Usuários.
-* **Autenticação Segura:** Sistema de autenticação baseado em `JSON Web Tokens` (JWT), garantindo que apenas usuários autenticados possam acessar os recursos.
-* **Sistema de Permissões Robusto:** Lógica de negócio implementada para que um usuário só possa visualizar e interagir com os projetos e tarefas dos quais faz parte (permissões a nível de objeto).
-* **Documentação Interativa:** A API é auto-documentada usando o padrão OpenAPI 3 (Swagger), fornecendo uma interface interativa para explorar e testar os endpoints.
-* **Ambiente Dockerizado:** Toda a aplicação e seu banco de dados (PostgreSQL) são gerenciados pelo Docker Compose, simplificando a configuração e o deploy.
-* **Testes Automatizados:** Suíte de testes com `pytest` para garantir a confiabilidade e a estabilidade da API.
-* **Configuração Segura:** Utiliza variáveis de ambiente (`.env`) para gerenciar segredos e configurações sensíveis.
+* **Autenticação Segura:** Sistema de autenticação baseado em `JSON Web Tokens` (JWT).
+* **Sistema de Permissões Robusto:** Lógica de negócio que garante que um usuário só possa interagir com os projetos e tarefas dos quais faz parte.
+* **Interface Administrativa Moderna:** Painel de administração customizado com `Django Jazzmin` para uma melhor experiência de usuário, incluindo temas, busca global e layout responsivo.
+* **Documentação Interativa:** API auto-documentada com o padrão OpenAPI 3 (Swagger UI e ReDoc).
+* **Ambiente Dockerizado:** Aplicação e banco de dados (PostgreSQL) gerenciados pelo Docker Compose.
+* **Testes Automatizados:** Suíte de testes com `pytest` para garantir a confiabilidade da API.
+* **Configuração Segura:** Utiliza variáveis de ambiente (`.env`) para gerenciar segredos.
 
 ---
 
@@ -35,8 +46,9 @@ Com a aplicação rodando, a documentação interativa da API pode ser acessada 
 | **Python** | Linguagem de programação principal |
 | **Django** | Framework web para a construção da API |
 | **Django REST Framework** | Toolkit para construir APIs RESTful robustas |
+| **Django Jazzmin** | Tema moderno para a interface de administração |
 | **PostgreSQL** | Banco de dados relacional |
-| **Docker & Docker Compose**| Ferramentas para containerização e orquestração do ambiente |
+| **Docker & Docker Compose**| Ferramentas para containerização e orquestração |
 | **JWT (Simple JWT)**| Padrão para autenticação baseada em tokens |
 | **drf-spectacular** | Geração automática de documentação OpenAPI/Swagger |
 | **pytest-django** | Framework para a execução dos testes automatizados |
@@ -56,40 +68,46 @@ Siga os passos abaixo para configurar e executar o ambiente de desenvolvimento.
 
 ### Passos de Instalação
 
-1.  **Clone o repositório:**
+1.  **Clone o repositório principal e navegue até a pasta do back-end:**
     ```bash
-    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
-    cd gerenciador-tarefas-backend
+    git clone [https://github.com/JamesCookDev/Task-Manager-Veloz.git](https://github.com/JamesCookDev/Task-Manager-Veloz.git)
+    cd Task-Manager-Veloz/gerenciador-tarefas-backend
     ```
 
 2.  **Crie o arquivo de ambiente:**
-    Nós utilizamos um arquivo `.env.example` como template. Copie-o para criar seu arquivo `.env` local.
+    Copie o template `.env.example` para criar seu arquivo `.env` local.
     ```bash
     cp .env.example .env
     ```
 
 3.  **Gere uma `SECRET_KEY`:**
-    O arquivo `.env` precisa de uma `SECRET_KEY` única. Execute o comando abaixo para gerar uma chave segura e cole-a no seu arquivo `.env`.
+    O arquivo `.env` precisa de uma `SECRET_KEY` única. Execute o comando abaixo e cole a chave gerada no seu arquivo `.env`.
     ```bash
-    docker-compose run --rm backend python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+    docker compose run --rm backend python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
     ```
-    *Abra o arquivo `.env` e cole a chave gerada na variável `SECRET_KEY`.*
 
 4.  **Construa e suba os contêineres:**
-    Este comando irá construir a imagem do Django, baixar a imagem do Postgres e iniciar os serviços.
+    Este comando irá construir as imagens e iniciar todos os serviços definidos no `docker-compose.yml` (backend, bff, db).
     ```bash
-    docker-compose up --build -d
+    docker compose up --build -d
     ```
     *(A flag `-d` executa os contêineres em segundo plano).*
 
 5.  **Crie um superusuário:**
-    Para acessar a área administrativa do Django, você precisa de um usuário.
+    Para acessar a área administrativa, você precisa de um usuário.
     ```bash
-    docker-compose exec backend python manage.py createsuperuser
+    docker 
+    compose exec backend python manage.py createsuperuser
     ```
     *Siga as instruções para criar seu usuário e senha.*
+    
+6.  **Colete os arquivos estáticos:**
+    Este passo é necessário para que o tema do Django Jazzmin seja carregado corretamente.
+    ```bash
+    docker compose exec backend python manage.py collectstatic --noinput
+    ```
 
-✅ **Pronto!** A API estará rodando e acessível em `http://localhost:8000/`.
+✅ **Pronto!** A API estará rodando em `http://localhost:8000/` e a interface administrativa em `http://localhost:8000/admin/`.
 
 ---
 
@@ -97,10 +115,7 @@ Siga os passos abaixo para configurar e executar o ambiente de desenvolvimento.
 
 Para garantir que tudo está funcionando como esperado, execute a suíte de testes automatizados:
 ```bash
-docker-compose exec backend pytest
+docker compose exec backend pytest
 ```
 
-## 🏗️ Estrutura do Projeto
-
-* **`core/`**: Contém as configurações globais do projeto Django (`settings.py`, `urls.py` principal).
-* **`app/`**: É a nossa aplicação principal, contendo os modelos (`models.py`), as regras da API (`views.py`, `serializers.py`), testes e outras lógicas de negócio do gerenciador de tarefas.
+```
