@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -137,6 +138,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -162,4 +166,19 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Documentação detalhada da API para o projeto Gerenciador de Tarefas da Veloz.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Gerenciador de Tarefas",
+    "site_header": "Gerenciador de Tarefas",
+    "site_brand": "Gerenciador de Tarefas",
+    "welcome_sign": "Bem-vindo ao Gerenciador de Tarefas",
+    "copyright": "Gerenciador de Tarefas",
+    "search_model": ["auth.User", "app.Project", "app.Task"],
+    "order_with_respect_to": ["auth", "app", "app.Project", "app.Task"],
+    
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "changeform_format": "horizontal_tabs",
 }

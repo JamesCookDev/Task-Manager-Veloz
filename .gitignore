@@ -27,3 +27,5 @@ htmlcov/
 
 /media/
 /static_root/
+
+staticfiles/
