@@ -117,5 +117,3 @@ Para garantir que tudo está funcionando como esperado, execute a suíte de test
 ```bash
 docker compose exec backend pytest
 ```
-
-```

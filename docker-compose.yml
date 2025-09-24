@@ -28,6 +28,17 @@ services:
       - db
     env_file:
       - .env
-  
+  bff:
+    build: 
+      context: ../task-manager-bff
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - DJANGO_API_URL=http://backend:8000/api/v1/projects/
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
