@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'rest_framework_simplejwt',
+    'djangogrpcframework',
 ]
 
 MIDDLEWARE = [
@@ -157,4 +158,10 @@ JAZZMIN_SETTINGS = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=90),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=180),
+}
+
+GRPC_FRAMEWORK = {
+    'ROOT_HANDLERS': [
+        'app.services',
+    ],
 }

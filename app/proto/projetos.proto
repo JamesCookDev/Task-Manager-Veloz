@@ -1,0 +1,35 @@
+// Especifica a versão da sintaxe do Protocol Buffers que estamos usando.
+syntax = "proto3";
+
+package projetos;
+
+option go_package = "./proto";
+
+// Define o nosso serviço. Pense nisso como a nossa "classe de API".
+service ProjetoService {
+  rpc ListarProjetos (ListarProjetosRequest) returns (ListarProjetosResponse);
+}
+
+// Define a estrutura da mensagem de requisição.
+message ListarProjetosRequest {}
+
+// Define a estrutura de um único Usuário (membro).
+message Usuario {
+  int32 id = 1;
+  string username = 2;
+}
+
+// Define a estrutura de um único Projeto.
+message Projeto {
+  int32 id = 1;
+  string title = 2;
+  string description = 3;
+  // Um campo 'repeated' significa que é uma lista ou array.
+  repeated Usuario members = 4;
+}
+
+// Define a estrutura da mensagem de resposta.
+message ListarProjetosResponse {
+  // A resposta conterá uma lista de projetos.
+  repeated Projeto projetos = 1;
+}
