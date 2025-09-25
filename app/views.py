@@ -23,6 +23,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return self.queryset.filter(members=user)
 
+    def perform_create(self, serializer):
+        project = serializer.save()
+        project.members.add(self.request.user)
+        project.save()
+
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all().select_related('project', 'assignee')
