@@ -18,11 +18,9 @@ from .permissions import IdProjectMember
 
 
 def login_view(request):
-    # Se o usuário já está logado, redireciona para o dashboard
     if request.user.is_authenticated:
         return redirect('dashboard')
     
-    # Verifica se é o primeiro acesso (não há usuários cadastrados)
     if not User.objects.exists():
         messages.info(request, 'Bem-vindo! Este parece ser o primeiro acesso. Crie sua conta para começar.')
         return redirect('signup')
@@ -34,7 +32,6 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            # Redireciona para a página solicitada ou dashboard
             next_url = request.GET.get('next', 'dashboard')
             return redirect(next_url)
         else:
@@ -51,13 +48,10 @@ def logout_view(request):
 
 @login_required
 def dashboard_view(request):
-    # Obter projetos do usuário
     projects = Project.objects.filter(members=request.user).prefetch_related('tarefas')
     
-    # Obter tarefas do usuário
     tasks = Task.objects.filter(project__in=projects).select_related('project', 'assignee')
     
-    # Estatísticas
     total_tasks = tasks.count()
     pending_tasks = tasks.filter(status='Pending').count()
     in_progress_tasks = tasks.filter(status='In Progress').count()
@@ -82,7 +76,6 @@ def update_task_status(request, task_id):
         task = get_object_or_404(Task, id=task_id, project__members=request.user)
         new_status = request.POST.get('status')
         
-        # Lista de status válidos
         valid_statuses = ['Pending', 'In Progress', 'Completed']
         
         if new_status in valid_statuses:
@@ -133,12 +126,10 @@ def profile_view(request):
     if request.method == 'POST':
         user = request.user
         
-        # Atualizar dados básicos
         user.first_name = request.POST.get('first_name', '')
         user.last_name = request.POST.get('last_name', '')
         user.email = request.POST.get('email', '')
         
-        # Verificar se quer alterar a senha
         current_password = request.POST.get('current_password')
         new_password = request.POST.get('new_password')
         confirm_password = request.POST.get('confirm_password')
@@ -201,7 +192,6 @@ class SignUpView(CreateView):
     template_name = 'registration/signup.html'
     
     def dispatch(self, request, *args, **kwargs):
-        # Se o usuário já está logado, redireciona para o dashboard
         if request.user.is_authenticated:
             return redirect('dashboard')
         return super().dispatch(request, *args, **kwargs)

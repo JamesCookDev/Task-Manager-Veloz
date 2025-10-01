@@ -7,10 +7,8 @@ from app.views import SignUpView
 
 
 def root_redirect(request):
-    # Se o usuário está autenticado, vai para o dashboard
     if request.user.is_authenticated:
         return redirect('dashboard')
-    # Se não está autenticado, vai para o login
     return redirect('login')
 
 
