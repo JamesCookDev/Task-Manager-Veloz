@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar Exclusão - Tarefa {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                            <i class="bi bi-house me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    {% if task.project %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'projects' %}" class="text-decoration-none">
+                            <i class="bi bi-folder me-1"></i>Projetos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="text-muted">{{ task.project.name }}</span>
+                    </li>
+                    {% endif %}
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Confirmar Exclusão
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Confirmar Exclusão
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Warning Alert -->
+                    <div class="alert alert-danger alert-permanent" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Atenção! Esta ação não pode ser desfeita
+                        </h5>
+                        <p class="mb-0">
+                            Você está prestes a excluir permanentemente esta tarefa e todos os dados associados a ela.
+                        </p>
+                    </div>
+
+                    <!-- Task Details -->
+                    <div class="card mb-4 border-start-danger">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">
+                                <i class="bi bi-list-task me-2"></i>
+                                {{ task.title }}
+                            </h5>
+
+                            {% if task.description %}
+                            <p class="card-text text-muted mb-3">
+                                <strong>Descrição:</strong> {{ task.description }}
+                            </p>
+                            {% endif %}
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-flag me-1"></i>
+                                        <strong>Status:</strong>
+                                        {% if task.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Pendente</span>
+                                        {% elif task.status == 'in_progress' %}
+                                        <span class="badge bg-info text-dark">Em Progresso</span>
+                                        {% elif task.status == 'completed' %}
+                                        <span class="badge bg-success">Concluída</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-exclamation-circle me-1"></i>
+                                        <strong>Prioridade:</strong>
+                                        {% if task.priority == 'low' %}
+                                        <span class="badge bg-secondary">Baixa</span>
+                                        {% elif task.priority == 'medium' %}
+                                        <span class="badge bg-warning text-dark">Média</span>
+                                        {% elif task.priority == 'high' %}
+                                        <span class="badge bg-danger">Alta</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                {% if task.project %}
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-folder me-1"></i>
+                                        <strong>Projeto:</strong> {{ task.project.name }}
+                                    </p>
+                                </div>
+                                {% endif %}
+                                {% if task.assignee %}
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-person me-1"></i>
+                                        <strong>Responsável:</strong> {{
+                                        task.assignee.get_full_name|default:task.assignee.username }}
+                                    </p>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-1">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        <strong>Criada em:</strong> {{ task.created_at|date:"d/m/Y" }}
+                                    </p>
+                                </div>
+                                {% if task.due_date %}
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-1">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        <strong>Prazo:</strong> {{ task.due_date|date:"d/m/Y" }}
+                                        {% if task.due_date < today %} <span class="badge bg-danger ms-1">
+                                            Atrasada</span>
+                                            {% elif task.due_date == today %}
+                                            <span class="badge bg-warning text-dark ms-1">Hoje</span>
+                                            {% endif %}
+                                    </p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post" class="no-loading">
+                        {% csrf_token %}
+
+                        <!-- Confirmation Checkbox -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                            <label class="form-check-label fw-semibold" for="confirmDelete">
+                                Eu entendo que esta ação é irreversível e confirmo a exclusão da tarefa
+                                <strong>"{{ task.title }}"</strong>
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+                                <i class="bi bi-trash3-fill me-2"></i>
+                                Excluir Tarefa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const confirmCheckbox = document.getElementById('confirmDelete');
+        const deleteBtn = document.getElementById('deleteBtn');
+
+        // Enable/disable delete button based on checkbox
+        confirmCheckbox.addEventListener('change', function () {
+            deleteBtn.disabled = !this.checked;
+
+            if (this.checked) {
+                deleteBtn.classList.remove('btn-secondary');
+                deleteBtn.classList.add('btn-danger');
+            } else {
+                deleteBtn.classList.remove('btn-danger');
+                deleteBtn.classList.add('btn-secondary');
+            }
+        });
+
+        // Add confirmation dialog
+        deleteBtn.addEventListener('click', function (e) {
+            if (confirmCheckbox.checked) {
+                if (!confirm('Tem certeza de que deseja excluir esta tarefa? Esta ação não pode ser desfeita.')) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        // Auto-focus on checkbox after page load
+        setTimeout(() => {
+            confirmCheckbox.focus();
+        }, 500);
+    });
+</script>
+{% endblock %}

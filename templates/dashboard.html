@@ -1,0 +1,643 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Gerenciador de Tarefas{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <div>
+        <h1 class="h2 fw-bold text-dark">
+            <i class="bi bi-speedometer2 text-primary me-2"></i>
+            Dashboard
+        </h1>
+        <p class="text-muted mb-0">Bem-vindo de volta, <strong>{{ user.first_name|default:user.username }}</strong>!</p>
+    </div>
+    <div class="btn-toolbar">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+            <i class="bi bi-plus-circle me-2"></i>
+            Nova Tarefa
+        </button>
+    </div>
+</div>
+
+<!-- Alert Messages -->
+{% if messages %}
+    <div class="row mb-4">
+        <div class="col-12">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                    {% if message.tags == 'success' %}
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                    {% elif message.tags == 'error' %}
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                    {% endif %}
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card border-start-primary h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="text-primary text-uppercase fw-bold mb-1">Total</h6>
+                        <h2 class="fw-bold mb-0">{{ total_tasks }}</h2>
+                        <small class="text-muted">tarefas</small>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-list-task"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card border-start-warning h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="text-warning text-uppercase fw-bold mb-1">Pendentes</h6>
+                        <h2 class="fw-bold mb-0">{{ pending_tasks }}</h2>
+                        <small class="text-muted">tarefas</small>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card border-start-info h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="text-info text-uppercase fw-bold mb-1">Em Progresso</h6>
+                        <h2 class="fw-bold mb-0">{{ in_progress_tasks }}</h2>
+                        <small class="text-muted">tarefas</small>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card border-start-success h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="text-success text-uppercase fw-bold mb-1">Concluídas</h6>
+                        <h2 class="fw-bold mb-0">{{ completed_tasks }}</h2>
+                        <small class="text-muted">tarefas</small>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-lightning-charge text-warning me-2"></i>
+                    Ações Rápidas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                            <i class="bi bi-plus-circle d-block mb-1"></i>
+                            Nova Tarefa
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'projects' %}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-folder d-block mb-1"></i>
+                            Ver Projetos
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-success w-100" onclick="filterTasks('completed')">
+                            <i class="bi bi-check-all d-block mb-1"></i>
+                            Concluídas
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-person-gear d-block mb-1"></i>
+                            Perfil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tasks Section -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="fw-bold mb-0">
+                <i class="bi bi-kanban text-primary me-2"></i>
+                Minhas Tarefas
+            </h6>
+            <small class="text-muted">Gerencie suas tarefas de forma eficiente</small>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- Filter buttons -->
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary active" onclick="filterTasks('all')" id="filter-all">
+                    Todas
+                </button>
+                <button type="button" class="btn btn-outline-warning" onclick="filterTasks('pending')" id="filter-pending">
+                    Pendentes
+                </button>
+                <button type="button" class="btn btn-outline-info" onclick="filterTasks('inprogress')" id="filter-inprogress">
+                    Em Progresso
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="filterTasks('completed')" id="filter-completed">
+                    Concluídas
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if tasks %}
+            <div class="row g-3" id="tasksContainer">
+                {% for task in tasks %}
+                    <div class="col-lg-4 col-md-6 task-item" data-status="{{ task.status|lower|cut:' ' }}">
+                        <div class="card task-card h-100 status-{{ task.status|lower|cut:' ' }}">
+                            <div class="card-header d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">{{ task.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-folder me-1"></i>{{ task.project.title }}
+                                    </small>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-ghost" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><h6 class="dropdown-header">Alterar Status</h6></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" onclick="changeTaskStatus({{ task.id }}, 'Pending')">
+                                                <i class="bi bi-clock text-warning me-2"></i>Pendente
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" onclick="changeTaskStatus({{ task.id }}, 'In Progress')">
+                                                <i class="bi bi-gear text-info me-2"></i>Em Progresso
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" onclick="changeTaskStatus({{ task.id }}, 'Completed')">
+                                                <i class="bi bi-check-circle text-success me-2"></i>Concluída
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" onclick="deleteTask({{ task.id }})">
+                                                <i class="bi bi-trash me-2"></i>Excluir
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ task.description|default:"Sem descrição"|truncatechars:100 }}</p>
+                                
+                                <div class="task-meta">
+                                    {% if task.assignee %}
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="bi bi-person text-muted me-2"></i>
+                                            <small class="text-muted">{{ task.assignee.username }}</small>
+                                        </div>
+                                    {% endif %}
+                                    {% if task.due_date %}
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="bi bi-calendar text-muted me-2"></i>
+                                            <small class="text-muted">{{ task.due_date|date:"d/m/Y" }}</small>
+                                        </div>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-clock text-muted me-2"></i>
+                                        <small class="text-muted">{{ task.created_at|date:"d/m/Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="badge status-badge
+                                    {% if task.status == 'Pending' %}bg-warning text-dark{% endif %}
+                                    {% if task.status == 'In Progress' %}bg-info text-dark{% endif %}
+                                    {% if task.status == 'Completed' %}bg-success{% endif %}">
+                                    {% if task.status == 'Pending' %}
+                                        <i class="bi bi-clock me-1"></i>Pendente
+                                    {% elif task.status == 'In Progress' %}
+                                        <i class="bi bi-gear me-1"></i>Em Progresso
+                                    {% elif task.status == 'Completed' %}
+                                        <i class="bi bi-check-circle me-1"></i>Concluída
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5" id="emptyState">
+                <div class="mb-4">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                </div>
+                <h4 class="text-muted mb-3">Nenhuma tarefa encontrada</h4>
+                <p class="text-muted mb-4">Parece que você está livre! Que tal criar uma nova tarefa?</p>
+                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Criar Primeira Tarefa
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="createTaskModalLabel">
+                    <i class="bi bi-plus-circle text-primary me-2"></i>
+                    Nova Tarefa
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'create_task' %}" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="title" class="form-label fw-semibold">
+                                <i class="bi bi-card-text text-primary me-1"></i>
+                                Título *
+                            </label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="Digite o título da tarefa" required>
+                            <div class="invalid-feedback">
+                                Por favor, insira um título para a tarefa.
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="description" class="form-label fw-semibold">
+                                <i class="bi bi-text-paragraph text-primary me-1"></i>
+                                Descrição
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="3" 
+                                      placeholder="Descreva os detalhes da tarefa..."></textarea>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="project" class="form-label fw-semibold">
+                                <i class="bi bi-folder text-primary me-1"></i>
+                                Projeto *
+                            </label>
+                            <select class="form-select" id="project" name="project" required>
+                                <option value="">Selecione um projeto</option>
+                                {% for project in projects %}
+                                    <option value="{{ project.id }}">{{ project.title }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, selecione um projeto.
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="assignee" class="form-label fw-semibold">
+                                <i class="bi bi-person text-primary me-1"></i>
+                                Responsável
+                            </label>
+                            <select class="form-select" id="assignee" name="assignee">
+                                <option value="">Selecione um responsável</option>
+                                {% for project in projects %}
+                                    {% for member in project.members.all %}
+                                        <option value="{{ member.id }}">{{ member.username }} ({{ project.title }})</option>
+                                    {% endfor %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="due_date" class="form-label fw-semibold">
+                                <i class="bi bi-calendar text-primary me-1"></i>
+                                Data de Vencimento
+                            </label>
+                            <input type="date" class="form-control" id="due_date" name="due_date">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="status" class="form-label fw-semibold">
+                                <i class="bi bi-flag text-primary me-1"></i>
+                                Status
+                            </label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="Pending">Pendente</option>
+                                <option value="In Progress">Em Progresso</option>
+                                <option value="Completed">Concluída</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Criar Tarefa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Statistics Cards */
+    .stat-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    /* Task Cards */
+    .task-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e3e6f0;
+    }
+
+    .task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+
+    .task-meta {
+        border-top: 1px solid #f1f1f1;
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+    }
+
+    /* Button Ghost */
+    .btn-ghost {
+        background: none;
+        border: none;
+        color: #6c757d;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .btn-ghost:hover {
+        background-color: rgba(0,0,0,0.05);
+        color: #495057;
+    }
+
+    /* Filter buttons */
+    .btn-group .btn.active {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: white;
+    }
+
+    /* Empty state */
+    #emptyState {
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+
+        .card-header .btn-group {
+            flex-wrap: wrap;
+        }
+
+        .card-header .btn-group .btn {
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Animation for task filtering */
+    .task-item {
+        transition: all 0.3s ease;
+    }
+
+    .task-item.fade-out {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    .task-item.fade-in {
+        opacity: 1;
+        transform: scale(1);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            const forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Task filtering
+    function filterTasks(status) {
+        const taskItems = document.querySelectorAll('.task-item');
+        const filterButtons = document.querySelectorAll('.btn-group .btn');
+        
+        // Update active button
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`filter-${status}`).classList.add('active');
+        
+        // Filter tasks
+        taskItems.forEach(item => {
+            const taskStatus = item.dataset.status;
+            if (status === 'all' || taskStatus === status) {
+                item.style.display = 'block';
+                item.classList.remove('fade-out');
+                item.classList.add('fade-in');
+            } else {
+                item.classList.remove('fade-in');
+                item.classList.add('fade-out');
+                setTimeout(() => {
+                    if (item.classList.contains('fade-out')) {
+                        item.style.display = 'none';
+                    }
+                }, 300);
+            }
+        });
+    }
+
+    // Change task status
+    async function changeTaskStatus(taskId, newStatus) {
+        try {
+            showLoading();
+            const response = await makeRequest(`/task/${taskId}/update-status/`, {
+                method: 'POST',
+                body: `status=${encodeURIComponent(newStatus)}`
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                // Show success message
+                showAlert('Status da tarefa atualizado com sucesso!', 'success');
+                // Reload page after delay
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showAlert('Erro ao atualizar status da tarefa', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('Erro ao atualizar status da tarefa', 'error');
+        }
+    }
+
+    // Delete task
+    async function deleteTask(taskId) {
+        if (!confirm('Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.')) {
+            return;
+        }
+
+        try {
+            showLoading();
+            const response = await makeRequest(`/task/${taskId}/delete/`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                showAlert('Tarefa excluída com sucesso!', 'success');
+                // Remove task from DOM with animation
+                const taskElement = document.querySelector(`[onclick*="${taskId}"]`).closest('.task-item');
+                taskElement.classList.add('fade-out');
+                setTimeout(() => {
+                    taskElement.remove();
+                    // Check if no tasks left
+                    if (document.querySelectorAll('.task-item').length === 0) {
+                        location.reload();
+                    }
+                }, 300);
+            } else {
+                showAlert('Erro ao excluir tarefa', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('Erro ao excluir tarefa', 'error');
+        }
+    }
+
+    // Show alert helper
+    function showAlert(message, type) {
+        const alertsContainer = document.querySelector('.main-content');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show d-flex align-items-center`;
+        alert.innerHTML = `
+            <i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'} me-2"></i>
+            <span>${message}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        alertsContainer.insertBefore(alert, alertsContainer.firstChild);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    }
+
+    // Auto-focus on modal open
+    document.getElementById('createTaskModal').addEventListener('shown.bs.modal', function() {
+        document.getElementById('title').focus();
+    });
+
+    // Statistics card click animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Add click animation
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    });
+</script>
+{% endblock %}

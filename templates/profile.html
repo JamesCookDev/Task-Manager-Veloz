@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil - Gerenciador de Tarefas{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Nova Tarefa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'projects' %}">
+                            <i class="bi bi-folder me-2"></i>
+                            Projetos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Meu Perfil</h1>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Profile Information Card -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="m-0 fw-bold text-primary">Informações Pessoais</h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="username" class="form-label">Nome de Usuário</label>
+                                            <input type="text" class="form-control" id="username"
+                                                value="{{ user.username }}" disabled>
+                                            <small class="form-text text-muted">O nome de usuário não pode ser
+                                                alterado.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">E-mail</label>
+                                            <input type="email" class="form-control" id="email" name="email"
+                                                value="{{ user.email }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="first_name" class="form-label">Primeiro Nome</label>
+                                            <input type="text" class="form-control" id="first_name" name="first_name"
+                                                value="{{ user.first_name }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="last_name" class="form-label">Sobrenome</label>
+                                            <input type="text" class="form-control" id="last_name" name="last_name"
+                                                value="{{ user.last_name }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <h6 class="fw-bold text-secondary mb-3">Alterar Senha (Opcional)</h6>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="current_password" class="form-label">Senha Atual</label>
+                                            <input type="password" class="form-control" id="current_password"
+                                                name="current_password">
+                                            <small class="form-text text-muted">Deixe em branco se não quiser alterar a
+                                                senha.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="new_password" class="form-label">Nova Senha</label>
+                                            <input type="password" class="form-control" id="new_password"
+                                                name="new_password">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="confirm_password" class="form-label">Confirmar Nova
+                                                Senha</label>
+                                            <input type="password" class="form-control" id="confirm_password"
+                                                name="confirm_password">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-left me-1"></i>
+                                        Voltar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Salvar Alterações
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Profile Summary Card -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="m-0 fw-bold text-primary">Resumo do Perfil</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
+                            </div>
+                            <h5 class="card-title">{{ user.username }}</h5>
+                            {% if user.first_name or user.last_name %}
+                            <p class="card-text text-muted">{{ user.first_name }} {{ user.last_name }}</p>
+                            {% endif %}
+                            {% if user.email %}
+                            <p class="card-text">
+                                <i class="bi bi-envelope me-1"></i>
+                                {{ user.email }}
+                            </p>
+                            {% endif %}
+                            <small class="text-muted">
+                                <i class="bi bi-calendar me-1"></i>
+                                Membro desde {{ user.date_joined|date:"F Y" }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Stats Card -->
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h6 class="m-0 fw-bold text-primary">Suas Estatísticas</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <div class="fs-4 fw-bold text-primary">{{ user.projetos.count }}</div>
+                                        <small class="text-muted">Projeto{{ user.projetos.count|pluralize:",s"
+                                            }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="fs-4 fw-bold text-success">{{ user.tarefas_atribuidas.count }}</div>
+                                    <small class="text-muted">Tarefa{{ user.tarefas_atribuidas.count|pluralize:",s"
+                                        }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validação de senha
+    document.getElementById('confirm_password').addEventListener('input', function () {
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = this.value;
+
+        if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+            this.setCustomValidity('As senhas não coincidem');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Validação para exigir senha atual se nova senha for informada
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const currentPassword = document.getElementById('current_password').value;
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+
+        if (newPassword && !currentPassword) {
+            e.preventDefault();
+            alert('Para alterar a senha, você deve informar a senha atual.');
+            document.getElementById('current_password').focus();
+        }
+
+        if (newPassword && newPassword !== confirmPassword) {
+            e.preventDefault();
+            alert('A nova senha e a confirmação devem ser iguais.');
+            document.getElementById('confirm_password').focus();
+        }
+    });
+</script>
+{% endblock %}

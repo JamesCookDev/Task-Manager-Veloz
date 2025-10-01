@@ -14,7 +14,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True, read_only=True)
+    members_ids = serializers.PrimaryKeyRelatedField(many=True, write_only=True, queryset=User.objects.all(), source='members')
     tasks = TaskSerializer(many=True, read_only=True, source='tarefas')
     class Meta:
         model = Project
-        fields = ['id', 'title', 'members', 'tasks']
+        fields = ['id', 'title', 'members', 'members_ids', 'tasks']

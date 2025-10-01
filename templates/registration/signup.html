@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Criar conta - Sistema de gerenciamento de tarefas e projetos">
+    <title>Criar Conta - Gerenciador de Tarefas</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>✓</text></svg>">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .signup-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 450px;
+            margin: 1rem;
+        }
+
+        .brand-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .form-floating>.form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-floating>.form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+        }
+
+        .text-muted a {
+            color: #6c757d !important;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .text-muted a:hover {
+            color: #0d6efd !important;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background-color: #e9ecef;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-weak {
+            background-color: #dc3545;
+        }
+
+        .strength-fair {
+            background-color: #fd7e14;
+        }
+
+        .strength-good {
+            background-color: #ffc107;
+        }
+
+        .strength-strong {
+            background-color: #198754;
+        }
+
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signup-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            [data-bs-theme="auto"] .signup-container {
+                background: rgba(33, 37, 41, 0.95);
+                color: #fff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signup-container">
+        <!-- Brand Section -->
+        <div class="brand-section">
+            <div class="brand-icon">
+                <i class="bi bi-check2-square"></i>
+            </div>
+            <h2 class="fw-bold text-dark mb-1">Criar Conta</h2>
+            <p class="text-muted mb-0">Junte-se ao nosso sistema de gerenciamento de tarefas</p>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {% if message.tags == 'error' %}
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {% elif message.tags == 'success' %}
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {% elif message.tags == 'warning' %}
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {% else %}
+            <i class="bi bi-info-circle-fill me-2"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Signup Form -->
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- First Name -->
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="id_first_name" name="first_name" placeholder="Nome"
+                    value="{{ form.first_name.value|default:'' }}" required>
+                <label for="id_first_name">
+                    <i class="bi bi-person me-2"></i>Nome
+                </label>
+                {% if form.first_name.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.first_name.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="id_last_name" name="last_name" placeholder="Sobrenome"
+                    value="{{ form.last_name.value|default:'' }}" required>
+                <label for="id_last_name">
+                    <i class="bi bi-person me-2"></i>Sobrenome
+                </label>
+                {% if form.last_name.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.last_name.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Username -->
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="id_username" name="username" placeholder="Nome de usuário"
+                    value="{{ form.username.value|default:'' }}" required>
+                <label for="id_username">
+                    <i class="bi bi-at me-2"></i>Nome de usuário
+                </label>
+                {% if form.username.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.username.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="form-text">
+                    <small>150 caracteres ou menos. Apenas letras, números e @/./+/-/_ são permitidos.</small>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="id_email" name="email" placeholder="E-mail"
+                    value="{{ form.email.value|default:'' }}" required>
+                <label for="id_email">
+                    <i class="bi bi-envelope me-2"></i>E-mail
+                </label>
+                {% if form.email.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.email.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="id_password1" name="password1" placeholder="Senha"
+                    required>
+                <label for="id_password1">
+                    <i class="bi bi-lock me-2"></i>Senha
+                </label>
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-3"
+                    style="z-index: 5;" onclick="togglePassword('id_password1', this)">
+                    <i class="bi bi-eye"></i>
+                </button>
+                {% if form.password1.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.password1.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <!-- Password Strength Indicator -->
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthBar"></div>
+                    </div>
+                    <small class="text-muted" id="strengthText">Digite uma senha</small>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-floating mb-4">
+                <input type="password" class="form-control" id="id_password2" name="password2"
+                    placeholder="Confirmar senha" required>
+                <label for="id_password2">
+                    <i class="bi bi-lock-fill me-2"></i>Confirmar senha
+                </label>
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-3"
+                    style="z-index: 5;" onclick="togglePassword('id_password2', this)">
+                    <i class="bi bi-eye"></i>
+                </button>
+                {% if form.password2.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.password2.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Terms Checkbox -->
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                <label class="form-check-label" for="acceptTerms">
+                    Eu aceito os <a href="#" class="text-decoration-none">Termos de Uso</a> e
+                    <a href="#" class="text-decoration-none">Política de Privacidade</a>
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100 py-3 mb-3">
+                <i class="bi bi-person-plus me-2"></i>
+                Criar Conta
+            </button>
+
+            <!-- Login Link -->
+            <div class="text-center">
+                <p class="text-muted mb-0">
+                    Já tem uma conta?
+                    <a href="{% url 'login' %}" class="text-decoration-none fw-semibold">
+                        Faça login aqui
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const checks = {
+                length: password.length >= 8,
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                numbers: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+
+            strength = Object.values(checks).filter(Boolean).length;
+
+            return {
+                score: strength,
+                checks: checks
+            };
+        }
+
+        // Update password strength indicator
+        function updatePasswordStrength() {
+            const password = document.getElementById('id_password1').value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+
+            if (!password) {
+                strengthBar.style.width = '0%';
+                strengthText.textContent = 'Digite uma senha';
+                strengthBar.className = 'strength-fill';
+                return;
+            }
+
+            const result = checkPasswordStrength(password);
+            const percentage = (result.score / 5) * 100;
+
+            strengthBar.style.width = percentage + '%';
+
+            if (result.score <= 2) {
+                strengthBar.className = 'strength-fill strength-weak';
+                strengthText.textContent = 'Senha fraca';
+            } else if (result.score === 3) {
+                strengthBar.className = 'strength-fill strength-fair';
+                strengthText.textContent = 'Senha razoável';
+            } else if (result.score === 4) {
+                strengthBar.className = 'strength-fill strength-good';
+                strengthText.textContent = 'Senha boa';
+            } else {
+                strengthBar.className = 'strength-fill strength-strong';
+                strengthText.textContent = 'Senha forte';
+            }
+        }
+
+        // Password match checker
+        function checkPasswordMatch() {
+            const password1 = document.getElementById('id_password1').value;
+            const password2 = document.getElementById('id_password2').value;
+            const confirmField = document.getElementById('id_password2');
+
+            if (password2 && password1 !== password2) {
+                confirmField.classList.add('is-invalid');
+            } else {
+                confirmField.classList.remove('is-invalid');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            const password1 = document.getElementById('id_password1');
+            const password2 = document.getElementById('id_password2');
+
+            password1.addEventListener('input', updatePasswordStrength);
+            password2.addEventListener('input', checkPasswordMatch);
+
+            // Form validation
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function (e) {
+                const acceptTerms = document.getElementById('acceptTerms');
+                if (!acceptTerms.checked) {
+                    e.preventDefault();
+                    alert('Você deve aceitar os termos de uso para continuar.');
+                    acceptTerms.focus();
+                }
+            });
+
+            // Auto-dismiss alerts
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    if (bsAlert) {
+                        bsAlert.close();
+                    }
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+
+</html>
